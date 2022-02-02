@@ -1,9 +1,5 @@
 #include <iostream>
 
-#include "sys/types.h"
-#include "sys/sysinfo.h"
-
-#include <iostream>
 #include <chrono>
 #include "src/SystemRessource.h"
 
