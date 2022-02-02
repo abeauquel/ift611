@@ -12,12 +12,16 @@
 
 
 struct MySysInfo{
-    float totalMemory;
-    float usedMemory;
+    __kernel_long_t time;
+    double totalVirtualMemory{};
+    double usedVirtualMemory{};
+    double physicalMemory{};
+    double usedPhysicalMemory{};
 
-    MySysInfo(float totalMemory, float usedMemory);
+    MySysInfo();
 
     friend std::ostream &operator<<(std::ostream &os, const MySysInfo &info);
+
 };
 
 class SystemRessource {
