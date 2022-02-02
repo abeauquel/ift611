@@ -8,21 +8,11 @@
 MySysInfo SystemRessource::getSystemInfo() {
 
     sysinfo(&memInfo);
-    unsigned long long totalVirtualMem = memInfo.totalram;
-//Add other values in next statement to avoid int overflow on right hand side...
-    //totalVirtualMem += memInfo.totalswap;
-    totalVirtualMem *= memInfo.mem_unit;
 
-    unsigned long long virtualMemUsed = memInfo.totalram - memInfo.freeram;
-//Add other values in next statement to avoid int overflow on right hand side...
-    //virtualMemUsed += memInfo.totalswap - memInfo.freeswap;
-    virtualMemUsed *= memInfo.mem_unit;
+    float totalram = memInfo.totalram * (unsigned long long)memInfo.mem_unit / 1024 * 1e-6;
+    float freeram = memInfo.freeram * (unsigned long long)memInfo.mem_unit / 1024 * 1e-6;
 
-
-    float rTVM = totalVirtualMem * 1e-9 ;
-    float rVM = virtualMemUsed * 1e-9 ;
-
-    return {rTVM, rVM};
+    return {totalram, totalram - freeram};
 }
 
 MySysInfo::MySysInfo(float totalMemory, float usedMemory) : totalMemory(totalMemory), usedMemory(usedMemory) {}
