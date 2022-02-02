@@ -9,19 +9,25 @@
 struct sysinfo memInfo;
 
 
-void fun()
+void getRamUse()
 {
-    std::cout<<"RAM usage"<< std::endl;
-//    sysinfo (&memInfo);
-//    long long totalVirtualMem = memInfo.totalram;
-////Add other values in next statement to avoid int overflow on right hand side...
-//    totalVirtualMem += memInfo.totalswap;
-//    totalVirtualMem *= memInfo.mem_unit;
-//
-//    long long virtualMemUsed = memInfo.totalram - memInfo.freeram;
-////Add other values in next statement to avoid int overflow on right hand side...
-//    virtualMemUsed += memInfo.totalswap - memInfo.freeswap;
-//    virtualMemUsed *= memInfo.mem_unit;
+
+    sysinfo (&memInfo);
+    long long totalVirtualMem = memInfo.totalram;
+//Add other values in next statement to avoid int overflow on right hand side...
+    totalVirtualMem += memInfo.totalswap;
+    totalVirtualMem *= memInfo.mem_unit  * 0.000001 * 0.001;
+
+    long long virtualMemUsed = memInfo.totalram - memInfo.freeram;
+//Add other values in next statement to avoid int overflow on right hand side...
+    virtualMemUsed += memInfo.totalswap - memInfo.freeswap;
+    virtualMemUsed *= memInfo.mem_unit * 0.000001 * 0.001;
+
+    std::cout<<"RAM usage : "
+            << " totalVirtualMem : " << totalVirtualMem << " gb"
+            << " virtualMemUsed : " << virtualMemUsed << " gb"
+            << " free memory : " << totalVirtualMem - virtualMemUsed << " gb"
+    << std::endl;
 }
 
 
@@ -39,7 +45,7 @@ int main() {
 
         if(std::chrono::steady_clock::now() - start > duration)
         {
-            fun();
+            getRamUse();
             start= std::chrono::steady_clock::now();
         }
     }
