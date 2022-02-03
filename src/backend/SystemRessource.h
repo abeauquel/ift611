@@ -9,20 +9,8 @@
 #include <linux/sysinfo.h>
 #include <sys/sysinfo.h>
 #include <ostream>
+#include "MySystemInfo.h"
 
-
-struct MySysInfo{
-    __kernel_long_t time;
-    double totalVirtualMemory{};
-    double usedVirtualMemory{};
-    double physicalMemory{};
-    double usedPhysicalMemory{};
-
-    MySysInfo();
-
-    friend std::ostream &operator<<(std::ostream &os, const MySysInfo &info);
-
-};
 
 class SystemRessource {
     struct sysinfo memInfo{};

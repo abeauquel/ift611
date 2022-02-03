@@ -1,28 +1,31 @@
 #include <iostream>
 
 #include <chrono>
-#include "src/SystemRessource.h"
+#include "src/frontend/Affichage.h"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "EndlessLoop"
 int main() {
 
     const int milli_seconds=1000;
 
-    std::cout << "Hello World!\n";
+    std::cout << "Hello World from my Task manager!\n";
 
 
     auto start= std::chrono::steady_clock::now();
     auto duration = std::chrono::seconds(1);
 
-    SystemRessource systemRessource{};
-    while(1)
+    Affichage affichage{};
+    while(true)
     {
 
         if(std::chrono::steady_clock::now() - start > duration)
         {
-            std::cout << systemRessource.getSystemInfo()  << std::endl;
+            affichage.afficherConsole();
             start= std::chrono::steady_clock::now();
         }
     }
 
 }
+#pragma clang diagnostic pop
 

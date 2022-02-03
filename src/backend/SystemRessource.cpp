@@ -3,6 +3,7 @@
 //
 
 #include "SystemRessource.h"
+#include "MySystemInfo.h"
 
 
 MySysInfo SystemRessource::getSystemInfo() {
@@ -37,14 +38,3 @@ MySysInfo SystemRessource::getSystemInfo() {
     return mySysInfo;
 }
 
-std::ostream &operator<<(std::ostream &os, const MySysInfo &info) {
-    os <<
-       "time " << info.time <<
-       " physicalMemory : " << info.physicalMemory << " gb " <<
-       " usedPhysicalMemory : " << info.usedPhysicalMemory << " gb " <<
-       " totalVirtualMemory: " << info.totalVirtualMemory << " gb " <<
-       " usedVirtualMemory: " << info.usedVirtualMemory << " gb";
-    return os;
-}
-
-MySysInfo::MySysInfo() = default;
