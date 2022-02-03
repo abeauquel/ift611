@@ -7,13 +7,17 @@
 
 
 MySysInfo SystemRessource::getSystemInfo() {
-    MySysInfo mySysInfo = getRamInfo();
-    mySysInfo.time = memInfo.uptime;
+    MySysInfo mySysInfo{};
+    getRessourceFomSysInfo(mySysInfo);
+
+    //todo getRessource from other function or source
+
+
 
     return mySysInfo;
 }
 
-MySysInfo SystemRessource::getRamInfo() {
+void SystemRessource::getRessourceFomSysInfo(MySysInfo &mySysInfo) {
 
     sysinfo(&memInfo);
 
@@ -34,14 +38,14 @@ MySysInfo SystemRessource::getRamInfo() {
 //Multiply in next statement to avoid int overflow on right hand side...
     physMemUsed *= memInfo.mem_unit;
 
-    MySysInfo mySysInfo{};
+    mySysInfo.time = memInfo.uptime;
     mySysInfo.totalVirtualMemory = totalVirtualMem / 1024 * 1e-6;
     mySysInfo.usedVirtualMemory = virtualMemUsed / 1024 * 1e-6;
     mySysInfo.physicalMemory = totalPhysMem / 1024 * 1e-6;
     mySysInfo.usedPhysicalMemory = physMemUsed / 1024 * 1e-6;
 
-    return mySysInfo;
 }
+
 
 
 
