@@ -7,6 +7,13 @@
 
 
 MySysInfo SystemRessource::getSystemInfo() {
+    MySysInfo mySysInfo = getRamInfo();
+    mySysInfo.time = memInfo.uptime;
+
+    return mySysInfo;
+}
+
+MySysInfo SystemRessource::getRamInfo() {
 
     sysinfo(&memInfo);
 
@@ -33,8 +40,8 @@ MySysInfo SystemRessource::getSystemInfo() {
     mySysInfo.physicalMemory = totalPhysMem / 1024 * 1e-6;
     mySysInfo.usedPhysicalMemory = physMemUsed / 1024 * 1e-6;
 
-    mySysInfo.time = memInfo.uptime;
-
     return mySysInfo;
 }
+
+
 

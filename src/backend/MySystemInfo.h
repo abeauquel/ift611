@@ -8,7 +8,7 @@
 
 
 struct MySysInfo{
-    int time{};
+    long time{};
     double totalVirtualMemory{};
     double usedVirtualMemory{};
     double physicalMemory{};

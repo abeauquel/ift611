@@ -13,7 +13,9 @@
 
 
 class SystemRessource {
+private:
     struct sysinfo memInfo{};
+    MySysInfo getRamInfo();
 public:
     MySysInfo getSystemInfo();
 };
