@@ -9,7 +9,7 @@
 MySysInfo SystemRessource::getSystemInfo() {
     MySysInfo mySysInfo{};
     getRessourceFomSysInfo(mySysInfo);
-
+    getCPUSage(mySysInfo);
     //todo getRessource from other function or source
 
 
@@ -44,6 +44,43 @@ void SystemRessource::getRessourceFomSysInfo(MySysInfo &mySysInfo) {
     mySysInfo.physicalMemory = totalPhysMem / 1024 * 1e-6;
     mySysInfo.usedPhysicalMemory = physMemUsed / 1024 * 1e-6;
 
+}
+
+static unsigned long long lastTotalUser, lastTotalUserLow, lastTotalSys, lastTotalIdle;
+
+
+void SystemRessource::getCPUSage(MySysInfo &mySysInfo){
+    double percent;
+    FILE* file = fopen("/proc/stat", "r");
+    fscanf(file, "cpu %llu %llu %llu %llu", &lastTotalUser, &lastTotalUserLow,
+           &lastTotalSys, &lastTotalIdle);
+    fclose(file);
+    unsigned long long totalUser, totalUserLow, totalSys, totalIdle, total;
+
+    file = fopen("/proc/stat", "r");
+    fscanf(file, "cpu %llu %llu %llu %llu", &totalUser, &totalUserLow,
+           &totalSys, &totalIdle);
+    fclose(file);
+
+    if (totalUser < lastTotalUser || totalUserLow < lastTotalUserLow ||
+        totalSys < lastTotalSys || totalIdle < lastTotalIdle){
+        //Overflow detection. Just skip this value.
+        percent = -1.0;
+    }
+    else{
+        total = (totalUser - lastTotalUser) + (totalUserLow - lastTotalUserLow) +
+                (totalSys - lastTotalSys);
+        percent = total;
+        total += (totalIdle - lastTotalIdle);
+        percent /= total;
+        percent *= 100;
+    }
+
+    mySysInfo.totalUser = totalUser;
+    mySysInfo.totalUserLow = totalUserLow;
+    mySysInfo.totalSys = totalSys;
+    mySysInfo.totalIdle = totalIdle;
+    mySysInfo.cpuUsagePercent = percent;
 }
 
 

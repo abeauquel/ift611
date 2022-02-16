@@ -16,8 +16,11 @@ class SystemRessource {
 private:
     struct sysinfo memInfo{};
     void getRessourceFomSysInfo(MySysInfo &mySysInfo);
+    void getCPUSage(MySysInfo &mySysInfo);
 public:
     MySysInfo getSystemInfo();
+
+
 };
 
 

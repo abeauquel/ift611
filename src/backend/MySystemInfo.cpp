@@ -6,14 +6,12 @@
 
 
 
+MySysInfo::MySysInfo() = default;
+
 std::ostream &operator<<(std::ostream &os, const MySysInfo &info) {
-    os <<
-       "time " << info.time <<
-       " physicalMemory : " << info.physicalMemory << " gb " <<
-       " usedPhysicalMemory : " << info.usedPhysicalMemory << " gb " <<
-       " totalVirtualMemory: " << info.totalVirtualMemory << " gb " <<
-       " usedVirtualMemory: " << info.usedVirtualMemory << " gb";
+    os << "time: " << info.time << " totalVirtualMemory: " << info.totalVirtualMemory << " usedVirtualMemory: "
+       << info.usedVirtualMemory << " physicalMemory: " << info.physicalMemory << " usedPhysicalMemory: "
+       << info.usedPhysicalMemory << "\n cpuUsagePercent: " << info.cpuUsagePercent << " totalUser: " << info.totalUser
+       << " totalUserLow: " << info.totalUserLow << " totalSys: " << info.totalSys << " totalIdle: " << info.totalIdle;
     return os;
 }
-
-MySysInfo::MySysInfo() = default;
