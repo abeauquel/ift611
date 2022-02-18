@@ -51,13 +51,13 @@ static unsigned long long lastTotalUser, lastTotalUserLow, lastTotalSys, lastTot
 
 void SystemRessource::getCPUSage(MySysInfo &mySysInfo){
     double percent;
-    FILE* file = fopen("/proc/stat", "r");
-    fscanf(file, "cpu %llu %llu %llu %llu", &lastTotalUser, &lastTotalUserLow,
-           &lastTotalSys, &lastTotalIdle);
-    fclose(file);
+//     = fopen("/proc/stat", "r");
+//    fscanf(file, "cpu %llu %llu %llu %llu", &lastTotalUser, &lastTotalUserLow,
+//           &lastTotalSys, &lastTotalIdle);
+//    fclose(file);
     unsigned long long totalUser, totalUserLow, totalSys, totalIdle, total;
 
-    file = fopen("/proc/stat", "r");
+    FILE* file = fopen("/proc/stat", "r");
     fscanf(file, "cpu %llu %llu %llu %llu", &totalUser, &totalUserLow,
            &totalSys, &totalIdle);
     fclose(file);
@@ -70,9 +70,9 @@ void SystemRessource::getCPUSage(MySysInfo &mySysInfo){
     else{
         total = (totalUser - lastTotalUser) + (totalUserLow - lastTotalUserLow) +
                 (totalSys - lastTotalSys);
-        percent = total;
+        percent = static_cast<double>(total);
         total += (totalIdle - lastTotalIdle);
-        percent /= total;
+        percent /= static_cast<double>(total);
         percent *= 100;
     }
 
