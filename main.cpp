@@ -13,7 +13,7 @@ int main() {
 
 
     auto start= std::chrono::steady_clock::now();
-    auto duration = std::chrono::seconds(1);
+    auto duration = std::chrono::milliseconds (500);
 
     Affichage affichage{};
     while(true)
