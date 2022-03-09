@@ -12,8 +12,8 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
 set(executable "ift611")
-add_subdirectory ("src")
-
-add_executable(${executable} "main.cpp")
+set(FRONTEND src/frontend)
+set(SOURCE ${FRONTEND}/window.cpp ${FRONTEND}/renderArea.cpp)
+add_executable(${executable} main.cpp ${SOURCE})
 
 target_link_libraries(ift611 PRIVATE Qt6::Widgets)
