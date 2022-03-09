@@ -2,6 +2,8 @@
 
 #include <chrono>
 #include "src/frontend/Affichage.h"
+#include <QtWidgets/QtWidgets>
+#include "src/frontend/window.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
@@ -16,6 +18,10 @@ int main() {
     auto duration = std::chrono::milliseconds (500);
 
     Affichage affichage{};
+    int i = 0;
+    QApplication app(i, nullptr);
+    Window window;
+    window.show();
     while(true)
     {
 

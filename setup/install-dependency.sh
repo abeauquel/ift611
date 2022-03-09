@@ -1,12 +1,12 @@
 #!/bin/bash
 # Install dependency
 # CMake
-sudo apt install -y software-properties-common lsb-release
-wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
-sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
-sudo apt update
-sudo apt install kitware-archive-keyring
-sudo apt install cmake
+#sudo apt install -y software-properties-common lsb-release
+#wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+#sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
+#sudo apt update
+#sudo apt install kitware-archive-keyring
+#sudo apt install cmake
 # Online QT
 wget https://d13lb3tujbc8s0.cloudfront.net/onlineinstallers/qt-unified-linux-x64-4.3.0-online.run
 chmod +x qt-unified-linux-x64-4.3.0-online.run
