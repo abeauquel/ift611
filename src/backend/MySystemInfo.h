@@ -14,10 +14,11 @@ struct MySysInfo{
     double physicalMemory{};
     double usedPhysicalMemory{};
     double cpuUsagePercent{};
-    unsigned long long totalUser{};
-    unsigned long long totalUserLow{};
-    unsigned long long totalSys{};
-    unsigned long long totalIdle{};
+    unsigned long long cpuIowait{};
+    unsigned long long cpuUserProcess{};
+    unsigned long long cpuNiceProcess{};
+    unsigned long long cpuSystemProcess{};
+    unsigned long long cpuSoftIrq{};
     MySysInfo();
 
     friend std::ostream &operator<<(std::ostream &os, const MySysInfo &info);

@@ -67,7 +67,7 @@ bool get_cpu_times(size_t &idle_time, size_t &total_time) {
 
 void SystemRessource::getCPUSage(MySysInfo &mySysInfo){
     const std::vector<size_t> cpu_times = get_cpu_times();
-    if (cpu_times.size() < 4)
+    if (cpu_times.size() < 6)
         return;
     size_t idle_time = cpu_times[3];
     long long total_time = std::accumulate(cpu_times.begin(), cpu_times.end(), 0);
@@ -81,6 +81,11 @@ void SystemRessource::getCPUSage(MySysInfo &mySysInfo){
     previous_total_time = total_time;
 
     mySysInfo.cpuUsagePercent = utilization;
+    mySysInfo.cpuUserProcess = cpu_times[0];
+    mySysInfo.cpuNiceProcess = cpu_times[1];
+    mySysInfo.cpuSystemProcess = cpu_times[2];
+    mySysInfo.cpuIowait = cpu_times[4];
+    mySysInfo.cpuSoftIrq = cpu_times[5];
 }
 
 
