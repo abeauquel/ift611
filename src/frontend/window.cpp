@@ -13,7 +13,7 @@ const float Pi = 3.14159f;
 
 
 
-Window::Window()
+Window::Window(MySysInfo mySysInfo)
 {
     QPainterPath rectPath;
     rectPath.moveTo(20.0, 30.0);
@@ -101,7 +101,7 @@ Window::Window()
     QPainterPath cpuGraph;
     cpuGraph.moveTo(0, 0);
     for (int i = 1; i < 10; ++i) {
-        cpuGraph.lineTo(10 * i, 10 * i);
+        cpuGraph.lineTo(10 * i, mySysInfo.cpuUsagePercent);
     }
     
     QPainterPath memoryText;
@@ -110,7 +110,7 @@ Window::Window()
     QPainterPath memoryGraph;
     memoryGraph.moveTo(0, 33);
     for (int i = 1; i < 10; ++i) {
-        memoryGraph.lineTo(10 * i, 33 + 33 * sin(i));
+        memoryGraph.lineTo(10 * i, 33 + 33*mySysInfo.usedVirtualMemory/mySysInfo.totalVirtualMemory);
     }
 
     QPainterPath IOText;
@@ -119,7 +119,7 @@ Window::Window()
     QPainterPath IOGraph;
     IOGraph.moveTo(0, 66);
     for (int i = 1; i < 10; ++i) {
-        IOGraph.lineTo(10 * i, 66 + 33 * cos(i));
+        IOGraph.lineTo(10 * i, 66 + mySysInfo.cpuIowait/1000);
     }
     
     renderAreas[0] = new RenderArea(cpuText);

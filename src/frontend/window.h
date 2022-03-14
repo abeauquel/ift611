@@ -2,6 +2,7 @@
 #define WINDOW_H
 
 #include <QWidget>
+#include "../backend/MySystemInfo.h"
 
 QT_BEGIN_NAMESPACE
 class QComboBox;
@@ -16,7 +17,7 @@ class Window : public QWidget
     Q_OBJECT
 
 public:
-    Window();
+    Window(MySysInfo);
 
 private slots:
     void fillRuleChanged();
