@@ -7,6 +7,7 @@
 
 #include "../backend/MySystemInfo.h"
 #include "../backend/SystemRessource.h"
+#include "../backend/WriteFile.h"
 #include <iostream>
 
 class Affichage {

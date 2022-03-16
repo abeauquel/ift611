@@ -6,6 +6,6 @@
 
 void Affichage::afficherConsole() {
     MySysInfo mySysInfo = systemRessource.getSystemInfo();
-
+    //WriteFile::writeSysInfoToFile(mySysInfo);
     std::cout << mySysInfo << std::endl;
 }
