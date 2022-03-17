@@ -38,7 +38,7 @@ int main() {
             start= std::chrono::steady_clock::now();
         }
     }
-    return app.exec();
+   // return app.exec();
 }
 #pragma clang diagnostic pop
 
