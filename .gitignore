@@ -1,4 +1,8 @@
-
+CMakeCache.txt
+CMakeFiles
 cmake-build-debug/
-
+Makefile
+ift611
+ift611_autogen
 .idea/
+cmake_install.cmake
