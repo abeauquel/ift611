@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <numeric>
+#include <iostream>
 #include "SystemRessource.h"
 #include "MySystemInfo.h"
 
@@ -18,6 +19,8 @@ MySysInfo SystemRessource::getSystemInfo() {
     getRessourceFomSysInfo(mySysInfo);
     getCPUSage(mySysInfo);
     //todo getRessource from other function or source
+
+    listProcess(mySysInfo);
 
     return mySysInfo;
 }
@@ -74,6 +77,26 @@ void SystemRessource::getCPUSage(MySysInfo &mySysInfo){
     mySysInfo.cpuSoftIrq = cpu_times[5];
 }
 
+void SystemRessource::listProcess(MySysInfo &mySysInfo){
 
+    int status = std::system("ps -ef >test.txt"); // execute the UNIX command "ls -l >test.txt"
+    std::ifstream file("test.txt");
+    file.ignore(56);// skip first line
+
+    while (!file.eof()) {
+        ProcessSysInfo p = ProcessSysInfo();
+
+        file >> p.user;
+        file >> p.pid;
+        file >> p.ppid;
+        file >> p.c;
+        file >> p.stime;
+        file >> p.tty;
+        file >> p.time;
+        getline(file, p.cmd);
+
+        mySysInfo.listProcess.push_back(p);
+    }
+}
 
 

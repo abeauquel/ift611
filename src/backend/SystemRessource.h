@@ -21,6 +21,7 @@ public:
     MySysInfo getSystemInfo();
 
 
+    void listProcess(MySysInfo &mySysInfo);
 };
 
 

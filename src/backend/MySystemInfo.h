@@ -8,7 +8,7 @@
 #include "vector"
 
 struct ProcessSysInfo{
-    char32_t name{};
+    std::basic_string<char> name{};
     double totalVirtualMemory{};
     double usedVirtualMemory{};
     double physicalMemory{};
@@ -21,6 +21,15 @@ struct ProcessSysInfo{
     unsigned long long cpuSoftIrq{};
     ProcessSysInfo();
     friend std::ostream &operator<<(std::ostream &os, const ProcessSysInfo &info);
+
+    std::string user;
+    short pid;
+    short ppid;
+    short c;
+    std::string stime;
+    std::string tty;
+    std::string time;
+    std::string cmd;
 
 };
 

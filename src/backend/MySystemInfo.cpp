@@ -13,8 +13,8 @@ std::ostream &operator<<(std::ostream &os, const MySysInfo &info) {
     << "totalMemory: " << info.totalMemory << " freeMemory: " << info.freeMemory << "\n availableMemory: "
     << info.availableMemory
     << "\n cpuIowait: " << info.cpuIowait
-    << "\n cpuUsagePercent: " << info.cpuUsagePercent ;
-//    << " totalUser: " << info.totalUser
+    << "\n cpuUsagePercent: " << info.cpuUsagePercent
+    << "\n nb Process: " << info.listProcess.size() ;
 //    << "\n totalUserLow: " << info.totalUserLow << " totalSys: " << info.totalSys << " totalIdle: " << info.totalIdle;
     return os;
 }
