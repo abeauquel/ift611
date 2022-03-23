@@ -16,12 +16,12 @@ class SystemRessource {
 private:
     struct sysinfo memInfo{};
     static void getRessourceFomSysInfo(MySysInfo &mySysInfo);
-    void getCPUSage(MySysInfo &mySysInfo);
+    static void getCPUSage(MySysInfo &mySysInfo);
 public:
-    MySysInfo getSystemInfo();
+    static MySysInfo getSystemInfo();
 
 
-    void listProcess(MySysInfo &mySysInfo);
+    static void listProcess(MySysInfo &mySysInfo);
 };
 
 

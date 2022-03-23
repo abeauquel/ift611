@@ -18,7 +18,6 @@ MySysInfo SystemRessource::getSystemInfo() {
 
     getRessourceFomSysInfo(mySysInfo);
     getCPUSage(mySysInfo);
-    //todo getRessource from other function or source
 
     listProcess(mySysInfo);
 
@@ -77,26 +76,60 @@ void SystemRessource::getCPUSage(MySysInfo &mySysInfo){
     mySysInfo.cpuSoftIrq = cpu_times[5];
 }
 
+//void SystemRessource::listProcess(MySysInfo &mySysInfo){
+//
+//    int status = std::system("ps -ef >test.txt"); // execute the UNIX command "ls -l >test.txt"
+//    std::ifstream file("test.txt");
+//    file.ignore(56);// skip first line
+//
+//    while (!file.eof()) {
+//        ProcessSysInfo p = ProcessSysInfo();
+//
+//        file >> p.user;
+//        file >> p.pid;
+//        file >> p.ppid;
+//        file >> p.c;
+//        file >> p.stime;
+//        file >> p.tty;
+//        file >> p.time;
+//        getline(file, p.cmd);
+//
+//        mySysInfo.listProcess.push_back(p);
+//    }
+//}
+
+//v2
 void SystemRessource::listProcess(MySysInfo &mySysInfo){
 
-    int status = std::system("ps -ef >test.txt"); // execute the UNIX command "ls -l >test.txt"
+    int status = std::system("pidstat -h -r -u -U -v >test.txt"); // execute the UNIX command "ls -l >test.txt"
     std::ifstream file("test.txt");
-    file.ignore(56);// skip first line
 
-    while (!file.eof()) {
-        ProcessSysInfo p = ProcessSysInfo();
+    //skip first 3 lines
+    file.ignore(std::numeric_limits<int>::max(), '\n');
+    file.ignore(std::numeric_limits<int>::max(), '\n');
+    file.ignore(std::numeric_limits<int>::max(), '\n');
 
+    ProcessSysInfo p = ProcessSysInfo();
+    while (file >> p.time) {
         file >> p.user;
         file >> p.pid;
-        file >> p.ppid;
-        file >> p.c;
-        file >> p.stime;
-        file >> p.tty;
-        file >> p.time;
-        getline(file, p.cmd);
+        file >> p.usrUsage;
+        file >> p.systemUsage;
+        file >> p.guestUsage;
+        file >> p.waitUsage;
+        file >> p.cpuUsage;
+        file >> p.cpuId;
+        file >> p.minflts;
+        file >> p.majflts;
+        file >> p.vsz;
+        file >> p.rss;
+        file >> p.memUsage;
+        file >> p.threadId;
+        file >> p.fdnr;
+        file >> p.cmd;
 
         mySysInfo.listProcess.push_back(p);
+        p = ProcessSysInfo();
     }
 }
-
 

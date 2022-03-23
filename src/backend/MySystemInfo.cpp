@@ -4,10 +4,6 @@
 
 #include "MySystemInfo.h"
 
-
-
-MySysInfo::MySysInfo() = default;
-
 std::ostream &operator<<(std::ostream &os, const MySysInfo &info) {
     os << "----------------------------------------------------------------------\n"
     << "totalMemory: " << info.totalMemory << " freeMemory: " << info.freeMemory << "\n availableMemory: "
@@ -21,9 +17,7 @@ std::ostream &operator<<(std::ostream &os, const MySysInfo &info) {
 
 std::ostream &operator<<(std::ostream &os, const ProcessSysInfo &info) {
     os << "----------------------------------------------------------------------\n"
-       << "process: " << info.name << " totalVirtualMemory: " << info.totalVirtualMemory << "\n usedVirtualMemory: ";
+       << "process: " << info.cmd << " memUsage: " << info.memUsage << "\n cpuUsage: " << info.cpuUsage;
 
     return os;
 }
-
-ProcessSysInfo::ProcessSysInfo() = default;
