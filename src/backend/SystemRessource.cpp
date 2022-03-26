@@ -8,35 +8,79 @@
 #include <iostream>
 #include "SystemRessource.h"
 #include "MySystemInfo.h"
+#include <thread>
+#include <atomic>
+#include <functional>
 
-static unsigned long long lastTotalUser, lastTotalUserLow, lastTotalSys, lastTotalIdle, previous_idle_time, previous_total_time;
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "EndlessLoop"
 
-MySysInfo SystemRessource::getSystemInfo() {
-    MySysInfo mySysInfo{};
-    //init cpu last usage
-    previous_idle_time=0, previous_total_time=0;
 
-    getRessourceFomSysInfo(mySysInfo);
-    getCPUSage(mySysInfo);
+static unsigned long long previous_idle_time, previous_total_time = 0;
+MySysInfo sysInfo1 = MySysInfo{};
+MySysInfo sysInfo2 = MySysInfo{};
+std::atomic<short> idSysInfo;
 
-    listProcess(mySysInfo);
+void periodicPull(unsigned int interval)
+{
+    std::thread([interval]()
+                {
+                    while (true)
+                    {
+                        auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(interval);
 
-    return mySysInfo;
+                        if(idSysInfo.load() == 1){
+                            sysInfo2 = SystemRessource::getRessourceFomSysInfo(std::move(sysInfo2));
+                            sysInfo2 = SystemRessource::getCPUSage(std::move(sysInfo2));
+                            sysInfo2 = SystemRessource::listProcess(std::move(sysInfo2));
+                            idSysInfo.store(2);
+                        }else{
+                            sysInfo1 = SystemRessource::getRessourceFomSysInfo(std::move(sysInfo1));
+                            sysInfo1 = SystemRessource::getCPUSage(std::move(sysInfo1));
+                            sysInfo1 = SystemRessource::listProcess(std::move(sysInfo1));
+                            idSysInfo.store(1);
+                        }
+
+                        std::this_thread::sleep_until(x);
+                    }
+                }).detach();
 }
 
-void SystemRessource::getRessourceFomSysInfo(MySysInfo &mySysInfo) {
+void SystemRessource::init() {
+    sysInfo1 = SystemRessource::getRessourceFomSysInfo(std::move(sysInfo1));
+    sysInfo1 = getCPUSage(std::move(sysInfo1));
+    sysInfo1 = listProcess(std::move(sysInfo1));
+    idSysInfo.store(1); // by default the sysInfo1 is ready
+    periodicPull(1000); //todo we change intervall pull
+}
+
+MySysInfo SystemRessource::getSystemInfo() {
+
+    if(previous_idle_time == 0){
+        init(); // todo force call to init
+    }
+
+    if(idSysInfo.load() == 1){
+        return sysInfo1;
+    }
+
+    return sysInfo2;
+}
+
+MySysInfo SystemRessource::getRessourceFomSysInfo(MySysInfo pSysInfo) {
     std::ifstream proc_meminfo("/proc/meminfo");
 
     proc_meminfo.ignore(9, ' '); // Skip the 'MemTotal:' prefix.
-    proc_meminfo >> mySysInfo.totalMemory;
+    proc_meminfo >> pSysInfo.totalMemory;
 
     proc_meminfo.ignore(13); // skip Kb: + MemFree: text
-    proc_meminfo >> mySysInfo.freeMemory;
+    proc_meminfo >> pSysInfo.freeMemory;
 
     proc_meminfo.ignore(18); // skip Kb: + MemAvailable: text
-    proc_meminfo >> mySysInfo.availableMemory;
+    proc_meminfo >> pSysInfo.availableMemory;
 
     proc_meminfo.close();
+    return pSysInfo;
 }
 
 
@@ -48,15 +92,10 @@ std::vector<size_t> get_cpu_times() {
     return times;
 }
 
-bool get_cpu_times(size_t &idle_time, size_t &total_time) {
-
-    return true;
-}
-
-void SystemRessource::getCPUSage(MySysInfo &mySysInfo){
+MySysInfo SystemRessource::getCPUSage(MySysInfo pSysInfo){
     const std::vector<size_t> cpu_times = get_cpu_times();
     if (cpu_times.size() < 6)
-        return;
+        return pSysInfo;
     size_t idle_time = cpu_times[3];
     long long total_time = std::accumulate(cpu_times.begin(), cpu_times.end(), 0);
     //for (size_t idle_time, total_time; get_cpu_times(idle_time, total_time); sleep(1)) {
@@ -68,38 +107,17 @@ void SystemRessource::getCPUSage(MySysInfo &mySysInfo){
     previous_idle_time = idle_time;
     previous_total_time = total_time;
 
-    mySysInfo.cpuUsagePercent = utilization;
-    mySysInfo.cpuUserProcess = cpu_times[0];
-    mySysInfo.cpuNiceProcess = cpu_times[1];
-    mySysInfo.cpuSystemProcess = cpu_times[2];
-    mySysInfo.cpuIowait = cpu_times[4];
-    mySysInfo.cpuSoftIrq = cpu_times[5];
+    pSysInfo.cpuUsagePercent = utilization;
+    pSysInfo.cpuUserProcess = cpu_times[0];
+    pSysInfo.cpuNiceProcess = cpu_times[1];
+    pSysInfo.cpuSystemProcess = cpu_times[2];
+    pSysInfo.cpuIowait = cpu_times[4];
+    pSysInfo.cpuSoftIrq = cpu_times[5];
+
+    return pSysInfo;
 }
 
-//void SystemRessource::listProcess(MySysInfo &mySysInfo){
-//
-//    int status = std::system("ps -ef >test.txt"); // execute the UNIX command "ls -l >test.txt"
-//    std::ifstream file("test.txt");
-//    file.ignore(56);// skip first line
-//
-//    while (!file.eof()) {
-//        ProcessSysInfo p = ProcessSysInfo();
-//
-//        file >> p.user;
-//        file >> p.pid;
-//        file >> p.ppid;
-//        file >> p.c;
-//        file >> p.stime;
-//        file >> p.tty;
-//        file >> p.time;
-//        getline(file, p.cmd);
-//
-//        mySysInfo.listProcess.push_back(p);
-//    }
-//}
-
-//v2
-void SystemRessource::listProcess(MySysInfo &mySysInfo){
+MySysInfo SystemRessource::listProcess(MySysInfo pSysInfo){
 
     int status = std::system("pidstat -h -r -u -U -v >test.txt"); // execute the UNIX command "ls -l >test.txt"
     std::ifstream file("test.txt");
@@ -109,6 +127,7 @@ void SystemRessource::listProcess(MySysInfo &mySysInfo){
     file.ignore(std::numeric_limits<int>::max(), '\n');
     file.ignore(std::numeric_limits<int>::max(), '\n');
 
+    pSysInfo.listProcess.clear();
     ProcessSysInfo p = ProcessSysInfo();
     while (file >> p.time) {
         file >> p.user;
@@ -128,8 +147,12 @@ void SystemRessource::listProcess(MySysInfo &mySysInfo){
         file >> p.fdnr;
         file >> p.cmd;
 
-        mySysInfo.listProcess.push_back(p);
+        pSysInfo.listProcess.push_back(p);
         p = ProcessSysInfo();
     }
+
+    return pSysInfo;
 }
 
+
+#pragma clang diagnostic pop
