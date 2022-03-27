@@ -9,18 +9,26 @@
 #include <linux/sysinfo.h>
 #include <sys/sysinfo.h>
 #include <ostream>
+#include <atomic>
 #include "MySystemInfo.h"
 
 
 class SystemRessource {
 private:
-    struct sysinfo memInfo{};
-    void getRessourceFomSysInfo(MySysInfo &mySysInfo);
-    void getCPUSage(MySysInfo &mySysInfo);
+
+
+
+
 public:
+    SystemRessource systemRessource(){
+        init();
+        return {};
+    };
     MySysInfo getSystemInfo();
-
-
+    static MySysInfo getRessourceFomSysInfo(MySysInfo pSysInfo);
+    static MySysInfo getCPUSage(MySysInfo pSysInfo);
+    static MySysInfo listProcess(MySysInfo pSysInfo);
+    void init();
 };
 
 
