@@ -9,8 +9,8 @@
 #include <iostream>
 #include <thread>
 
-Chart cpuChart = Chart("CPU Usage", 10 * 100, std::tuple<int, int>(0, 100));
-Chart memChart("Memory Usage", 1000, std::tuple<int, int>(0, 160000));
+//Chart *cpuChart;
+//Chart *memChart;
 SystemRessource systemRessource;
 
 Window::Window() 
@@ -18,8 +18,8 @@ Window::Window()
 
     MySysInfo mySysInfo = systemRessource.getSystemInfo();
 //    std::cout<< mySysInfo.cpuUsagePercent << std::endl;
-    cpuChart = Chart("CPU Usage", mySysInfo.cpuUsagePercent * 100, std::tuple<int, int>(0, 100));
-    memChart = Chart("Memory Usage", mySysInfo.totalMemory - mySysInfo.availableMemory, std::tuple<int, int>(0, mySysInfo.totalMemory));
+    Chart cpuChart = Chart("CPU Usage", mySysInfo.cpuUsagePercent, std::tuple<int, int>(0, 100));
+    Chart memChart = Chart("Memory Usage", mySysInfo.totalMemory - mySysInfo.availableMemory, std::tuple<int, int>(0, mySysInfo.totalMemory));
     QGridLayout *layout = new QGridLayout;
 //    chart.addPoint(50);
 //    Chart chart1(title, initialPoint, verticalAxisRange);
@@ -28,15 +28,34 @@ Window::Window()
     layout->addWidget(memChart.getChartView(), 1, 0);
 //    layout->addWidget(chart2.getChartView(), 2, 0);
     setLayout(layout);
-    int interval = 500;
+    int interval = 1000;
+
+   // mySysInfo = systemRessource.getSystemInfo();
+//    cpuChart.addPoint(mySysInfo.cpuUsagePercent);
+//    memChart.addPoint(mySysInfo.totalMemory - mySysInfo.availableMemory);
+
     std::thread([interval]()
                 {
+
+                    float testcpu = 35.6;
+                    size_t testMem = 8000;
                     while (true)
                     {
                         auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(interval);
-                        MySysInfo mySysInfo = systemRessource.getSystemInfo();
-                        cpuChart.addPoint(mySysInfo.cpuUsagePercent * 100);
-                        memChart.addPoint(mySysInfo.totalMemory - mySysInfo.availableMemory);
+                        testcpu+= 1.0;
+                        testMem += 100;
+                        //todo update with new values
+
+                        // todo Fix la methode add point
+                        // Passer des references dans la lambda , [interval, &cpuChart, &memChart]
+                        // tester :
+                        //    cpuChart.addPoint(testcpu);
+                        //    memChart.addPoint(testMem);
+
+                        //si ca marche tester :
+                        // mySysInfo = systemRessource.getSystemInfo();
+                        // cpuChart.addPoint(mySysInfo.cpuUsagePercent);
+                        // memChart.addPoint(mySysInfo.totalMemory - mySysInfo.availableMemory);
                         std::this_thread::sleep_until(x);
                     }
                 }).detach();

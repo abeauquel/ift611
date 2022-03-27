@@ -34,11 +34,22 @@ Chart::Chart(const char* title, float initialPoint, std::tuple<int, int> vertica
 void Chart::addPoint(float newPoint)
 {
     series->remove(0);
-    for(QPointF point : series->points())
-    {
-        point.rx()--;
+
+//    series->append(pointInsertPosition, newPoint);
+//    for(QPointF point : series->points())
+//    {
+//        point.rx()--;
+//    }
+//    series->
+
+    QSplineSeries *newSeries;
+    newSeries = new QSplineSeries();
+    for(int i = 0; i != 9; ++i){
+        QPointF point = series->at(i);
+        newSeries->append(point.x() - 1, point.y());
     }
-    series->append(pointInsertPosition, newPoint);
+
+    newSeries->append(pointInsertPosition, newPoint);
     chart->removeSeries(series);
-    chart->addSeries(series);
+    chart->addSeries(newSeries);
 }

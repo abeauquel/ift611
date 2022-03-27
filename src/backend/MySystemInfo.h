@@ -37,10 +37,6 @@ struct ProcessSysInfo{
 
 struct MySysInfo{
     long time{};
-    double totalVirtualMemory{};
-    double usedVirtualMemory{};
-    double physicalMemory{};
-    double usedPhysicalMemory{};
     size_t freeMemory{};
     size_t availableMemory{};
     size_t totalMemory{};
