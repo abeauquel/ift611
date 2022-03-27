@@ -2,51 +2,22 @@
 #define WINDOW_H
 
 #include <QWidget>
-#include "../backend/MySystemInfo.h"
-
-QT_BEGIN_NAMESPACE
-class QComboBox;
-class QLabel;
-class QSpinBox;
-QT_END_NAMESPACE
-class RenderArea;
+#include "chart.h"
+#include "../backend/SystemRessource.h"
 
 
 class Window : public QWidget
 {
     Q_OBJECT
 
+//private:
+//    SystemRessource systemRessource;
+//    MySysInfo mySysInfo
+
 public:
-    Window(MySysInfo);
-
-private slots:
-    void fillRuleChanged();
-    void fillGradientChanged();
-    void penColorChanged();
-
-
-
+    Window();
 private:
-    void populateWithColors(QComboBox *comboBox);
-    QVariant currentItemData(QComboBox *comboBox);
-
-
-
-    enum { NumRenderAreas = 6 };
-
-    RenderArea *renderAreas[NumRenderAreas];
-    QLabel *fillRuleLabel;
-    QLabel *fillGradientLabel;
-    QLabel *fillToLabel;
-    QLabel *penWidthLabel;
-    QLabel *penColorLabel;
-    QLabel *rotationAngleLabel;
-    QComboBox *fillRuleComboBox;
-    QComboBox *fillColor1ComboBox;
-    QComboBox *fillColor2ComboBox;
-    QSpinBox *penWidthSpinBox;
-    QComboBox *penColorComboBox;
-    QSpinBox *rotationAngleSpinBox;
+    void update(Chart);
 };
 
 
