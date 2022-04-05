@@ -1,25 +1,18 @@
 #include "chart.h"
 #include <QSplineSeries>
+#include <QLineSeries>
 #include <QChart>
 #include <QChartView>
 #include <tuple>
 #include <QPointF>
+#include <iostream>
 
 Chart::Chart(const char* title, float initialPoint, std::tuple<int, int> verticalAxisRange)
 {
     series = new QSplineSeries();
- //   series->setName("spline");
-    for(int i = 0; i != 9; ++i)
-        series->append(i, initialPoint);
+    for(int i = 0; i < pointInsertPosition; ++i)
+        series->append(i, 5);
     series->append(pointInsertPosition, initialPoint);
-/*
-    series->append(0, 6);
-    series->append(2, 4);
-    series->append(3, 8);
-    series->append(7, 4);
-    series->append(10, 5);
-    *series << QPointF(11, 1) << QPointF(13, 3) << QPointF(17, 6) << QPointF(18, 3) << QPointF(20, 2);
-  */  
     chart = new QChart();
     chart->legend()->hide();
     chart->addSeries(series);
@@ -28,28 +21,17 @@ Chart::Chart(const char* title, float initialPoint, std::tuple<int, int> vertica
     chart->axes(Qt::Vertical).first()->setRange(std::get<0>(verticalAxisRange), std::get<1>(verticalAxisRange));
     chart->axes(Qt::Horizontal).first()->setRange(0, pointInsertPosition); 
     chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
 }
 
 void Chart::addPoint(float newPoint)
 {
-    series->remove(0);
-
-//    series->append(pointInsertPosition, newPoint);
-//    for(QPointF point : series->points())
-//    {
-//        point.rx()--;
-//    }
-//    series->
-
-    QSplineSeries *newSeries;
-    newSeries = new QSplineSeries();
-    for(int i = 0; i != 9; ++i){
+    for (int i = 1; i <= pointInsertPosition; ++i)
+    {
         QPointF point = series->at(i);
-        newSeries->append(point.x() - 1, point.y());
+        QPointF toReplace = series->at(i - 1);
+        point.setX(toReplace.rx());
+        series->replace(toReplace, point);
     }
-
-    newSeries->append(pointInsertPosition, newPoint);
-    chart->removeSeries(series);
-    chart->addSeries(newSeries);
+    //series->remove(pointInsertPosition);
+    series->replace(pointInsertPosition, QPointF(pointInsertPosition, newPoint));
 }
