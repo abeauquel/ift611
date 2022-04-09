@@ -34,7 +34,7 @@ MySysInfo WriteFile::readSysInfoFromFile(std::string filename) {
     MySysInfo result;
     int k = sizeof(MySysInfo);
 
-    std::ifstream file("test.bin", std::ios::binary | std::ios::ate);
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);
     if (!file) {
         std::cout << "Cannot open file!" << std::endl;
         return result;
