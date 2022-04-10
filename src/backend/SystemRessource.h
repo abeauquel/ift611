@@ -15,20 +15,10 @@
 
 class SystemRessource {
 private:
-
-
-
-
 public:
-    SystemRessource systemRessource(){
-        init();
-        return {};
-    };
-    MySysInfo getSystemInfo();
     static MySysInfo getRessourceFomSysInfo(MySysInfo pSysInfo);
     static MySysInfo getCPUSage(MySysInfo pSysInfo);
     static MySysInfo listProcess(MySysInfo pSysInfo);
-    void init();
 };
 
 

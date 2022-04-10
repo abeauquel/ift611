@@ -17,55 +17,6 @@
 
 
 static unsigned long long previous_idle_time, previous_total_time = 0;
-MySysInfo sysInfo1 = MySysInfo{};
-MySysInfo sysInfo2 = MySysInfo{};
-std::atomic<short> idSysInfo;
-
-void periodicPull(unsigned int interval)
-{
-    std::thread([interval]()
-                {
-                    while (true)
-                    {
-                        auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(interval);
-
-                        if(idSysInfo.load() == 1){
-                            sysInfo2 = SystemRessource::getRessourceFomSysInfo(std::move(sysInfo2));
-                            sysInfo2 = SystemRessource::getCPUSage(std::move(sysInfo2));
-                            sysInfo2 = SystemRessource::listProcess(std::move(sysInfo2));
-                            idSysInfo.store(2);
-                        }else{
-                            sysInfo1 = SystemRessource::getRessourceFomSysInfo(std::move(sysInfo1));
-                            sysInfo1 = SystemRessource::getCPUSage(std::move(sysInfo1));
-                            sysInfo1 = SystemRessource::listProcess(std::move(sysInfo1));
-                            idSysInfo.store(1);
-                        }
-
-                        std::this_thread::sleep_until(x);
-                    }
-                }).detach();
-}
-
-void SystemRessource::init() {
-    sysInfo1 = SystemRessource::getRessourceFomSysInfo(std::move(sysInfo1));
-    sysInfo1 = getCPUSage(std::move(sysInfo1));
-    sysInfo1 = listProcess(std::move(sysInfo1));
-    idSysInfo.store(1); // by default the sysInfo1 is ready
-    periodicPull(1000); //todo we change intervall pull
-}
-
-MySysInfo SystemRessource::getSystemInfo() {
-
-    if(previous_idle_time == 0){
-        init(); // todo force call to init
-    }
-
-    if(idSysInfo.load() == 1){
-        return sysInfo1;
-    }
-
-    return sysInfo2;
-}
 
 MySysInfo SystemRessource::getRessourceFomSysInfo(MySysInfo pSysInfo) {
     std::ifstream proc_meminfo("/proc/meminfo");

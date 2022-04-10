@@ -12,7 +12,7 @@
 #include "../backend/SystemRessource.h"
 #include "../backend/MySystemInfo.h"
 
-Window::Window(): systemRessource{}, mySysInfo{systemRessource.getSystemInfo()}, cpuChart{this, "CPU Usage", mySysInfo.cpuUsagePercent, std::tuple<int, int>(0, 100)}, updateManager{}, updateThread{this}
+Window::Window(): systemRessource{}, mySysInfo{}, cpuChart{this, "CPU Usage", 10.0, std::tuple<int, int>(0, 100)}, updateManager{}, updateThread{this}
 {
     createRessourcePage();
     createDetailPage();
