@@ -25,4 +25,4 @@ file(GLOB BACKEND_SRC
         )
 add_executable(${executable} main.cpp ${BACKEND_SRC} ${FRONTEND_SRC})
 
-target_link_libraries(ift611 PRIVATE Qt6::Widgets Qt6::Charts)
+target_link_libraries(ift611 PRIVATE Qt6::Widgets Qt6::Charts Qt6::Core Qt6::Gui)
