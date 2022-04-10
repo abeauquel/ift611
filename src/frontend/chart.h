@@ -1,19 +1,27 @@
 #ifndef CHART_H
 #define CHART_H
 
-//#include <QWidget>
 #include <QSplineSeries>
+#include <QLineSeries>
 #include <QChart>
 #include <QChartView>
 #include <tuple>
+#include <QWidget>
+//#include "../backend/MySystemInfo.h"
 
-class Chart 
+class Chart : public QWidget 
 {
+
+    Q_OBJECT
+
+public slots:
+    void addPoint(double);
+
 public:
-    Chart(const char* title, float initialPoint, std::tuple<int, int> vertialAxisRange);
+    Chart(QWidget *parent, const char* title, double initialPoint, std::tuple<int, int> vertialAxisRange);
     QWidget* getChartView() { return chartView; }
-    void addPoint(float);
-private:
+
+private:   
     enum { pointInsertPosition = 10 };
     QSplineSeries *series;
     QChart *chart;

@@ -17,7 +17,7 @@ file(GLOB BACKEND_SRC
         "src/backend/*.h"
         "src/backend/*.cpp"
         )
-set(SOURCE ${FRONTEND}/application.cpp ${FRONTEND}/chart.cpp ${FRONTEND}/window.cpp)
+set(SOURCE ${FRONTEND}/application.cpp ${FRONTEND}/chart.cpp ${FRONTEND}/window.cpp ${FRONTEND}/updateManager.cpp)
 add_executable(${executable} main.cpp ${SOURCE} ${BACKEND_SRC})
 
 
