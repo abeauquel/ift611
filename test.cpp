@@ -1,12 +1,12 @@
 #include <iostream>
-
+#include <ctime>
 #include <chrono>
 #include "src/frontend/window.h"
 #include "src/backend/MySystemInfo.h"
 #include "src/backend/SystemRessource.h"
 #include <assert.h>
 #include "src/backend/WriteFile.h"
-#include <unistd.h>
+//#include <unistd.h>
 #include <thread>
 
 #pragma clang diagnostic push
@@ -38,6 +38,7 @@ int main() {
     auto timeAverage = std::chrono::duration_cast<std::chrono::nanoseconds>(end - end);
     auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - end);
     auto timeTotal = std::chrono::duration_cast<std::chrono::nanoseconds>(end - end);
+    float temp;
 
     auto debut = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < nbIter; i++) {
@@ -53,13 +54,15 @@ int main() {
         end = std::chrono::high_resolution_clock::now();
         time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
         timeTotal = std::chrono::duration_cast<std::chrono::nanoseconds>(time);
-        std::cout << "getRessourceFomSysInfo Duration: " << time.count() << " ns\n";
+        temp = time.count() / 1'000'000'000.0;
+        std::cout << "getRessourceFomSysInfo Duration: " << temp << " seconds\n";
         start = std::chrono::high_resolution_clock::now();
         sysInfo = SystemRessource::getCPUSage(std::move(sysInfo));       //getCPUsage
         end = std::chrono::high_resolution_clock::now();
         time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
         timeTotal = std::chrono::duration_cast<std::chrono::nanoseconds>(timeTotal + time);
-        std::cout << "getCPUSage Duration: " << time.count() << " ns\n";
+        temp = time.count() / 1'000'000'000.0;
+        std::cout << "getCPUSage Duration: " << temp << " seconds\n";
         
         timeAverage = std::chrono::duration_cast<std::chrono::nanoseconds>(timeTotal + timeAverage);
         if (i == 1) {
@@ -81,7 +84,8 @@ int main() {
         WriteFile::writeSysInfoToFile(sysInfo);
         end = std::chrono::high_resolution_clock::now();
         time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        std::cout << "WriteFile Duration: " << time.count() << " ns\n";
+        temp = time.count() / 1'000'000'000.0;
+        std::cout << "WriteFile Duration: " << temp << " secondes\n";
 
 
         //TEST readFile
@@ -93,7 +97,8 @@ int main() {
         auto mySysInfoReaded = WriteFile::readSysInfoFromFile(filename);
         end = std::chrono::high_resolution_clock::now();
         time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        std::cout << "ReadFile Duration: " << time.count() << " ns\n";
+        temp = time.count() / 1'000'000'000.0;
+        std::cout << "ReadFile Duration: " << temp << " secondes\n";
 
 
         //Test que la lecture retrouve les bonnes données
@@ -109,7 +114,7 @@ int main() {
         assert(sysInfo.time == mySysInfoReaded.time);
         assert(sysInfo.totalMemory == mySysInfoReaded.totalMemory);
 
-        sleep(5);
+        //sleep(5);
 
         std::cout << sysInfo.cpuUsagePercent << "\n";
 
@@ -127,12 +132,16 @@ int main() {
         std::cout << "idSysInfo.store Duration: " << time.count() << " ns\n";*/
     }
     auto fin = std::chrono::high_resolution_clock::now();
-    auto temp = std::chrono::duration_cast<std::chrono::nanoseconds>(fin - debut);
-    std::cout << "Total Duration: " << temp.count() << " ns\n";
+    time = std::chrono::duration_cast<std::chrono::nanoseconds>(fin - debut);
+    temp = time.count() / 1'000'000'000.0;
+    std::cout << "Total Duration: " << temp << " secondes\n";
 
-    std::cout << "Temp d'execution Minimal: " << timeMin.count() << " ns\n";
-    std::cout << "Temp d'execution Maximal: " << timeMax.count() << " ns\n";
-    std::cout << "Temp Total d'execution moyen: " << timeAverage.count()/nbIter << " ns\n";
+    temp = timeMin.count() / 1'000'000'000.0;
+    std::cout << "Temp d'execution Minimal: " << temp << " secondes\n";
+    temp = timeMax.count() / 1'000'000'000.0;
+    std::cout << "Temp d'execution Maximal: " << temp << " secondes\n";
+    temp = timeAverage.count() / (1'000'000'000.0 * nbIter);
+    std::cout << "Temp Total d'execution moyen: " << temp << " secondes\n";
 
 }
 
