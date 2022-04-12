@@ -18,6 +18,7 @@ private:
     enum{ windowSize = 800 };
     QTabWidget *tab;
     Chart cpuChart;
+    Chart memChart;
     SystemRessource systemRessource;
     MySysInfo mySysInfo;
     UpdateManager updateManager;

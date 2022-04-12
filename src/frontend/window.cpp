@@ -11,9 +11,17 @@
 #include "updateManager.h"
 #include "../backend/SystemRessource.h"
 #include "../backend/MySystemInfo.h"
+#include <iostream>
 
-Window::Window(): systemRessource{}, mySysInfo{systemRessource.getSystemInfo()}, cpuChart{this, "CPU Usage", mySysInfo.cpuUsagePercent, std::tuple<int, int>(0, 100)}, updateManager{}, updateThread{this}
+Window::Window(): systemRessource{}, 
+                  mySysInfo{systemRessource.getSystemInfo()}, 
+                  cpuChart{this, "CPU Usage", mySysInfo.cpuUsagePercent, std::tuple<int, int>(0, 100)}, 
+                  memChart{this, "Memory Usage", mySysInfo.usedVirtualMemory, std::tuple<int, int>(0, int(mySysInfo.totalVirtualMemory))},
+                  updateManager{}, 
+                  updateThread{this}
 {
+    std::cout<<mySysInfo.usedVirtualMemory<<std::endl;
+    std::cout<<int(mySysInfo.totalVirtualMemory)<<std::endl;
     createRessourcePage();
     createDetailPage();
     prepareUpdates();
@@ -25,8 +33,10 @@ void Window::createRessourcePage()
     cpuChart.addPoint(30.4);
     cpuChart.addPoint(5.1);
     cpuChart.addPoint(50);
+    memChart.addPoint(10);
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(cpuChart.getChartView(), 0, 0);
+    layout->addWidget(memChart.getChartView(), 1, 0);
     auto page = new QWidget(this);
     page->setLayout(layout);
     tab->resize(windowSize, windowSize);
