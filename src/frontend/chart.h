@@ -18,7 +18,7 @@ public slots:
     void addPoint(double);
 
 public:
-    Chart(QWidget *parent, const char* title, double initialPoint, std::tuple<int, int> vertialAxisRange);
+    Chart(QWidget *parent, const char* title, std::tuple<int, int> vertialAxisRange);
     QWidget* getChartView() { return chartView; }
 
 private:   

@@ -14,10 +14,13 @@ class UpdateManager : public QObject
     Q_OBJECT
 public:
 signals:
-    void signal(double);
+    void updateCPU(double);
+    void updateMemory(double);
+    void updateIO(double);
+    void updateProcess(MySysInfo);
 private:
+    enum { kiloBytes_to_gigaBytes = 1'048'576 };
     SystemRessource systemRessource;
-//    UpdateManager updateManager;
     std::atomic<bool> updateInProgress{ true };
 public:
     UpdateManager() : systemRessource{} {};

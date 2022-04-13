@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTabWidget>
 #include <QThread>
+#include <QGridLayout>
 #include "chart.h"
 #include "updateManager.h"
 #include "../backend/SystemRessource.h"
@@ -19,9 +20,12 @@ private:
     QTabWidget *tab;
     Chart cpuChart;
     Chart memChart;
+    Chart ioChart;
     SystemRessource systemRessource;
     MySysInfo mySysInfo;
     UpdateManager updateManager;
+    QWidget *detailPage;
+    QGridLayout *detailLayout;
 
 public:
 signals:
@@ -30,11 +34,14 @@ signals:
 
 public:
     Window();
+    void updateDetailPage(MySysInfo);
     ~Window();
 private:
     void prepareUpdates();
     void createRessourcePage();
     void createDetailPage();
+    void createTitleDetailPage();
+    void addProcessToDetailPage(MySysInfo);
 };
 
 

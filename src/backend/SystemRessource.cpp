@@ -5,50 +5,33 @@
 #include <fstream>
 #include <vector>
 #include <numeric>
+#include <iostream>
 #include "SystemRessource.h"
 #include "MySystemInfo.h"
+#include <thread>
+#include <atomic>
+#include <functional>
 
-static unsigned long long lastTotalUser, lastTotalUserLow, lastTotalSys, lastTotalIdle, previous_idle_time, previous_total_time;
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "EndlessLoop"
 
-MySysInfo SystemRessource::getSystemInfo() {
-    MySysInfo mySysInfo{};
-    //init cpu last usage
-    previous_idle_time=0, previous_total_time=0;
 
-    getRessourceFomSysInfo(mySysInfo);
-    getCPUSage(mySysInfo);
-    //todo getRessource from other function or source
+static unsigned long long previous_idle_time, previous_total_time = 0;
 
-    return mySysInfo;
-}
+MySysInfo SystemRessource::getRessourceFomSysInfo(MySysInfo pSysInfo) {
+    std::ifstream proc_meminfo("/proc/meminfo");
 
-void SystemRessource::getRessourceFomSysInfo(MySysInfo &mySysInfo) {
+    proc_meminfo.ignore(9, ' '); // Skip the 'MemTotal:' prefix.
+    proc_meminfo >> pSysInfo.totalMemory;
 
-    sysinfo(&memInfo);
+    proc_meminfo.ignore(13); // skip Kb: + MemFree: text
+    proc_meminfo >> pSysInfo.freeMemory;
 
-    unsigned long long totalVirtualMem = memInfo.totalram;
-//Add other values in next statement to avoid int overflow on right hand side...
-    totalVirtualMem += memInfo.totalswap;
-    totalVirtualMem *= memInfo.mem_unit;
-    unsigned long long virtualMemUsed = memInfo.totalram - memInfo.freeram;
-//Add other values in next statement to avoid int overflow on right hand side...
-    virtualMemUsed += memInfo.totalswap - memInfo.freeswap;
-    virtualMemUsed *= memInfo.mem_unit;
+    proc_meminfo.ignore(18); // skip Kb: + MemAvailable: text
+    proc_meminfo >> pSysInfo.availableMemory;
 
-    long long totalPhysMem = memInfo.totalram;
-//Multiply in next statement to avoid int overflow on right hand side...
-    totalPhysMem *= memInfo.mem_unit;
-
-    long long physMemUsed = memInfo.totalram - memInfo.freeram;
-//Multiply in next statement to avoid int overflow on right hand side...
-    physMemUsed *= memInfo.mem_unit;
-
-    mySysInfo.time = memInfo.uptime;
-    mySysInfo.totalVirtualMemory = totalVirtualMem / 1024 * 1e-6;
-    mySysInfo.usedVirtualMemory = virtualMemUsed / 1024 * 1e-6;
-    mySysInfo.physicalMemory = totalPhysMem / 1024 * 1e-6;
-    mySysInfo.usedPhysicalMemory = physMemUsed / 1024 * 1e-6;
-
+    proc_meminfo.close();
+    return pSysInfo;
 }
 
 
@@ -60,15 +43,10 @@ std::vector<size_t> get_cpu_times() {
     return times;
 }
 
-bool get_cpu_times(size_t &idle_time, size_t &total_time) {
-
-    return true;
-}
-
-void SystemRessource::getCPUSage(MySysInfo &mySysInfo){
+MySysInfo SystemRessource::getCPUSage(MySysInfo pSysInfo){
     const std::vector<size_t> cpu_times = get_cpu_times();
     if (cpu_times.size() < 6)
-        return;
+        return pSysInfo;
     size_t idle_time = cpu_times[3];
     long long total_time = std::accumulate(cpu_times.begin(), cpu_times.end(), 0);
     //for (size_t idle_time, total_time; get_cpu_times(idle_time, total_time); sleep(1)) {
@@ -80,14 +58,52 @@ void SystemRessource::getCPUSage(MySysInfo &mySysInfo){
     previous_idle_time = idle_time;
     previous_total_time = total_time;
 
-    mySysInfo.cpuUsagePercent = utilization;
-    mySysInfo.cpuUserProcess = cpu_times[0];
-    mySysInfo.cpuNiceProcess = cpu_times[1];
-    mySysInfo.cpuSystemProcess = cpu_times[2];
-    mySysInfo.cpuIowait = cpu_times[4];
-    mySysInfo.cpuSoftIrq = cpu_times[5];
+    pSysInfo.cpuUsagePercent = utilization;
+    pSysInfo.cpuUserProcess = cpu_times[0];
+    pSysInfo.cpuNiceProcess = cpu_times[1];
+    pSysInfo.cpuSystemProcess = cpu_times[2];
+    pSysInfo.cpuIowait = cpu_times[4];
+    pSysInfo.cpuSoftIrq = cpu_times[5];
+
+    return pSysInfo;
+}
+
+MySysInfo SystemRessource::listProcess(MySysInfo pSysInfo){
+
+    int status = std::system("pidstat -h -r -u -U -v >test.txt"); // execute the UNIX command "ls -l >test.txt"
+    std::ifstream file("test.txt");
+
+    //skip first 3 lines
+    file.ignore(std::numeric_limits<int>::max(), '\n');
+    file.ignore(std::numeric_limits<int>::max(), '\n');
+    file.ignore(std::numeric_limits<int>::max(), '\n');
+
+    pSysInfo.listProcess.clear();
+    ProcessSysInfo p = ProcessSysInfo();
+    while (file >> p.time) {
+        file >> p.user;
+        file >> p.pid;
+        file >> p.usrUsage;
+        file >> p.systemUsage;
+        file >> p.guestUsage;
+        file >> p.waitUsage;
+        file >> p.cpuUsage;
+        file >> p.cpuId;
+        file >> p.minflts;
+        file >> p.majflts;
+        file >> p.vsz;
+        file >> p.rss;
+        file >> p.memUsage;
+        file >> p.threadId;
+        file >> p.fdnr;
+        file >> p.cmd;
+
+        pSysInfo.listProcess.push_back(p);
+        p = ProcessSysInfo();
+    }
+
+    return pSysInfo;
 }
 
 
-
-
+#pragma clang diagnostic pop
