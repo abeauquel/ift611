@@ -8,7 +8,8 @@
 #include <ctime>   
 #include <sstream> 
 #include <iomanip> 
-#include <string>  
+#include <string>
+#include <thread>
 
 std::string NowToString()
 {
@@ -17,7 +18,7 @@ std::string NowToString()
     auto in_time_t = std::chrono::system_clock::to_time_t(now);
 
     std::stringstream ss{};
-    ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %H:%M:%S.%f");
+    ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %H:%M:%S");
     return ss.str();
 }
 
@@ -39,14 +40,16 @@ void WriteFile::writeSysInfoToFile(MySysInfo info) {
     int k = sizeof(MySysInfo);
     char* buffer = static_cast<char*>(static_cast<void*>(&info));
 
-    time_t now = time(0);
+    time_t now = time(nullptr);
     char* date_time = ctime(&now);
     std::string filename = "MySysInfo-" + NowToString();
 
     write_file_binary(filename, buffer, k);
+    std::cout << "Write archive : " << filename << std::endl;
+
 }
 
-MySysInfo WriteFile::readSysInfoFromFile(std::string filename) {
+MySysInfo WriteFile::readSysInfoFromFile(const std::string& filename) {
 
     MySysInfo result;
     int k = sizeof(MySysInfo);
@@ -63,12 +66,17 @@ MySysInfo WriteFile::readSysInfoFromFile(std::string filename) {
     return result;
 }
 
-void WriteFile::archive() {
-    MySysInfo sysInfo = MySysInfo{};
-    SystemRessource systemRessource{};
-    while (true) {
-        sysInfo = systemRessource.getSystemInfo();
-        WriteFile::writeSysInfoToFile(sysInfo);
-    }
+void WriteFile::startArchive(size_t interval) {
+    std::thread([interval]()
+        {
+            MySysInfo sysInfo = MySysInfo{};
+            while (true) {
+                auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(interval);
+                sysInfo = SystemRessource::getRessourceFomSysInfo(std::move(sysInfo));
+                sysInfo = SystemRessource::getCPUSage(std::move(sysInfo));
+                WriteFile::writeSysInfoToFile(sysInfo);
+                std::this_thread::sleep_until(x);
+            }
+        }).detach();
 }
 
