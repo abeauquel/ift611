@@ -23,7 +23,6 @@ Window::Window(): systemRessource{},
 {
     createRessourcePage();
     createDetailPage();
-    updateDetailPage(SystemRessource::listProcess(MySysInfo{}));
     prepareUpdates();
 }
 
@@ -45,6 +44,7 @@ void Window::createDetailPage()
     detailPage = new QWidget(this);
     detailLayout = new QGridLayout;
     createTitleDetailPage();
+    addProcessToDetailPage(SystemRessource::listProcess(MySysInfo{}));
     detailPage->setLayout(detailLayout);
     tab->addTab(detailPage, "Detail");
 }
