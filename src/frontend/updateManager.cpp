@@ -19,7 +19,7 @@ void UpdateManager::update()
         emit updateCPU(sysInfo.cpuUsagePercent);
         emit updateIO(sysInfo.cpuIowait);
         sysInfo = SystemRessource::listProcess(std::move(sysInfo));
-        emit updateProcess(std::move(sysInfo));
+        emit updateProcess(sysInfo);
         std::this_thread::sleep_until(x);
     }
 }
