@@ -16,7 +16,7 @@
 Window::Window(): systemRessource{}, 
                   mySysInfo{}, 
                   cpuChart{this, "CPU Usage", std::tuple<int, int>(0, 100)}, 
-                  memChart{this, "Memory Usage", std::tuple<int, int>(0, ((SystemRessource::getRessourceFomSysInfo(MySysInfo{}).totalMemory)/1'048'576.0},
+                  memChart{this, "Memory Usage", std::tuple<int, int>(0, ((SystemRessource::getRessourceFomSysInfo(MySysInfo{}).totalMemory)/1'048'576.0))},
                   ioChart{this, "I/O Usager", std::tuple<int, int>(0, 1000)},
                   updateManager{}, 
                   updateThread{this}
