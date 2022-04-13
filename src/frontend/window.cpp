@@ -11,22 +11,29 @@
 #include "updateManager.h"
 #include "../backend/SystemRessource.h"
 #include "../backend/MySystemInfo.h"
+#include <iostream>
 
-Window::Window(): systemRessource{}, mySysInfo{}, cpuChart{this, "CPU Usage", 10.0, std::tuple<int, int>(0, 100)}, updateManager{}, updateThread{this}
+Window::Window(): systemRessource{}, 
+                  mySysInfo{}, 
+                  cpuChart{this, "CPU Usage", std::tuple<int, int>(0, 100)}, 
+                  memChart{this, "Memory Usage", std::tuple<int, int>(0, 16)},
+                  ioChart{this, "I/O Usager", std::tuple<int, int>(0, 1000)},
+                  updateManager{}, 
+                  updateThread{this}
 {
     createRessourcePage();
     createDetailPage();
+    updateDetailPage(SystemRessource::listProcess(MySysInfo{}));
     prepareUpdates();
 }
 
 void Window::createRessourcePage()
 {
     tab = new QTabWidget(this);
-    cpuChart.addPoint(30.4);
-    cpuChart.addPoint(5.1);
-    cpuChart.addPoint(50);
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(cpuChart.getChartView(), 0, 0);
+    layout->addWidget(memChart.getChartView(), 1, 0);
+    layout->addWidget(ioChart.getChartView(), 2, 0);
     auto page = new QWidget(this);
     page->setLayout(layout);
     tab->resize(windowSize, windowSize);
@@ -35,41 +42,66 @@ void Window::createRessourcePage()
 
 void Window::createDetailPage()
 {
-    auto page = new QWidget(this);
-    QGridLayout *layout = new QGridLayout;
-
-    QLabel *title_name = new QLabel(tr("Processus Name:"));
-    QLabel *title_usage = new QLabel(tr("Processus usage:"));
-
-    QLabel *proc_1_name = new QLabel(tr("proc_1"));
-    QLabel *proc_1_usage = new QLabel(tr("20%"));
-
-    QLabel *proc_2_name = new QLabel(tr("proc_2"));
-    QLabel *proc_2_usage = new QLabel(tr("43%"));
-
-    QLabel *proc_3_name = new QLabel(tr("proc_3"));
-    QLabel *proc_3_usage = new QLabel(tr("12%"));
-
-    QLabel *proc_4_name = new QLabel(tr("proc_4"));
-    QLabel *proc_4_usage = new QLabel(tr("25%"));
-
-    layout->addWidget(title_name, 0, 0);
-    layout->addWidget(title_usage, 0, 1);
-    
-    layout->addWidget(proc_1_name, 1, 0);
-    layout->addWidget(proc_1_usage, 1, 1);
-
-    layout->addWidget(proc_2_name, 2, 0);
-    layout->addWidget(proc_2_usage, 2, 1);
-
-    layout->addWidget(proc_3_name, 3, 0);
-    layout->addWidget(proc_3_usage, 3, 1);
-
-    layout->addWidget(proc_4_name, 4, 0);
-    layout->addWidget(proc_4_usage, 4, 1);
-    page->setLayout(layout);
-    tab->addTab(page, "Detail");
+    detailPage = new QWidget(this);
+    detailLayout = new QGridLayout;
+    createTitleDetailPage();
+    detailPage->setLayout(detailLayout);
+    tab->addTab(detailPage, "Detail");
 }
+
+void Window::createTitleDetailPage()
+{
+    QLabel *title_pid = new QLabel(tr("PID"));
+    QLabel *title_ppid = new QLabel(tr("PPID"));
+    QLabel *title_user_usage = new QLabel(tr("User Usage"));
+    QLabel *title_sys_usage = new QLabel(tr("System Usage"));
+    QLabel *title_cpu_usage = new QLabel(tr("CPU Usage"));
+    QLabel *title_mem_usage = new QLabel(tr("Memory Usage"));
+    
+    detailLayout->addWidget(title_pid, 0, 0);
+    detailLayout->addWidget(title_ppid, 0, 1);
+    detailLayout->addWidget(title_user_usage, 0, 2);
+    detailLayout->addWidget(title_sys_usage, 0, 3);
+    detailLayout->addWidget(title_cpu_usage, 0, 4);
+    detailLayout->addWidget(title_mem_usage, 0, 5);
+}
+
+void Window::addProcessToDetailPage(MySysInfo mySysInfo)
+{
+    int row_count = 1;
+    for(auto process : mySysInfo.listProcess)
+    {
+        QLabel *pid = new QLabel(QString::number(process.pid));
+        QLabel *ppid = new QLabel(QString::number(process.ppid));
+        QLabel *user_usage = new QLabel(process.usrUsage);
+        QLabel *sys_usage = new QLabel(process.systemUsage);
+        QLabel *cpu_usage = new QLabel(process.cpuUsage);
+        QLabel *mem_usage = new QLabel(process.memUsage);
+    
+        detailLayout->addWidget(pid, row_count, 0);
+        detailLayout->addWidget(ppid, row_count, 1);
+        detailLayout->addWidget(user_usage, row_count, 2);
+        detailLayout->addWidget(sys_usage, row_count, 3);
+        detailLayout->addWidget(cpu_usage, row_count, 4);
+        detailLayout->addWidget(mem_usage, row_count, 5);
+        ++row_count;
+    }
+}
+
+void Window::updateDetailPage(MySysInfo mySysInfo)
+{
+    QLayoutItem *item;
+    while((item = detailLayout->takeAt(0)))
+    {
+        delete item->widget();
+    }
+    delete detailLayout;
+    detailLayout = new QGridLayout;
+    createTitleDetailPage();
+    addProcessToDetailPage(mySysInfo);
+    detailPage->setLayout(detailLayout);
+}
+
 
 void Window::prepareUpdates()
 {
@@ -77,27 +109,19 @@ void Window::prepareUpdates()
     connect(&updateThread, &QThread::finished, &updateManager, &QObject::deleteLater);
 
     connect(this, &Window::startUpdate, &updateManager, &UpdateManager::update);
-    connect(&updateManager, &UpdateManager::signal, &cpuChart, &Chart::addPoint);
+    connect(&updateManager, &UpdateManager::updateCPU, &cpuChart, &Chart::addPoint);
+    connect(&updateManager, &UpdateManager::updateMemory, &memChart, &Chart::addPoint);
+    connect(&updateManager, &UpdateManager::updateIO, &ioChart, &Chart::addPoint);
+    connect(&updateManager, &UpdateManager::updateProcess, this, &Window::updateDetailPage);
     updateThread.start();
-//    updateManager.start();
     emit startUpdate();
 }
 
 Window::~Window()
 {   
     updateManager.end();
-//    updateManager.wait();
-//    updateManager.quit();
-    //updateThread.requestInterruption();
     updateThread.wait();
     updateThread.quit();
-/*
-    if(!updateThread.wait(1000))
-    {
-        updateThread.terminate();
-    }
-    updateThread.exit();
-*/
 }
 
 

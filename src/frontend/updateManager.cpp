@@ -13,24 +13,18 @@ void UpdateManager::update()
     while (updateInProgress)
     {
         auto x = std::chrono::steady_clock::now() + std::chrono::milliseconds(interval);
-
         sysInfo = SystemRessource::getRessourceFomSysInfo(std::move(sysInfo));
+        emit updateMemory((sysInfo.totalMemory - sysInfo.availableMemory) / 1'000'000'000.0);
         sysInfo = SystemRessource::getCPUSage(std::move(sysInfo));
-        emit signal(sysInfo.cpuUsagePercent);
-
+        emit updateCPU(sysInfo.cpuUsagePercent);
+        emit updateIO(sysInfo.cpuIowait);
+        sysInfo = SystemRessource::listProcess(std::move(sysInfo));
+        emit updateProcess(std::move(sysInfo));
         std::this_thread::sleep_until(x);
     }
-    std::cout<<"Done"<<std::endl;
 }
 
 void UpdateManager::end()
 {
-    /*
-    mutex.lock();
-    updateInProgress =  false;
-    mutex.unlock();
-    */
-    std::cout << "Here" << std::endl;
     updateInProgress = false;
-    std::cout<< updateInProgress << std::endl;
 }

@@ -14,7 +14,10 @@ class UpdateManager : public QObject
     Q_OBJECT
 public:
 signals:
-    void signal(double);
+    void updateCPU(double);
+    void updateMemory(double);
+    void updateIO(double);
+    void updateProcess(MySysInfo);
 private:
     SystemRessource systemRessource;
 //    UpdateManager updateManager;

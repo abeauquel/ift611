@@ -8,13 +8,12 @@
 #include <iostream>
 #include <QWidget>
 
-Chart::Chart(QWidget *parent, const char* title, double initialPoint, std::tuple<int, int> verticalAxisRange)
+Chart::Chart(QWidget *parent, const char* title, std::tuple<int, int> verticalAxisRange)
 {
     setParent(parent);
     series = new QSplineSeries();
-    for(int i = 0; i < pointInsertPosition; ++i)
-        series->append(i, 5);
-    series->append(pointInsertPosition, initialPoint);
+    for(int i = 0; i <= pointInsertPosition; ++i)
+        series->append(i, 0);
     chart = new QChart();
     chart->legend()->hide();
     chart->addSeries(series);
@@ -34,6 +33,5 @@ void Chart::addPoint(double newPoint)
         point.setX(toReplace.rx());
         series->replace(toReplace, point);
     }
-    //series->remove(pointInsertPosition);
     series->replace(pointInsertPosition, QPointF(pointInsertPosition, newPoint));
 }
