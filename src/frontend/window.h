@@ -12,7 +12,7 @@
 
 class Window : public QWidget
 {
-    Q_OBJECT
+Q_OBJECT
     QThread updateThread;
 
 private:

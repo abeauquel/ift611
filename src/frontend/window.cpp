@@ -50,7 +50,7 @@ void Window::createDetailPage()
     mySysInfo = SystemRessource::listProcess(mySysInfo);
     if(!mySysInfo.listProcess.empty()){
         createTitleDetailPage(mySysInfo.listProcess[0].time);
-       // mySysInfo= addProcessToDetailPage(std::move(mySysInfo));
+        // mySysInfo= addProcessToDetailPage(std::move(mySysInfo));
         detailPage->setLayout(detailLayout);
     }
     scroll->setWidgetResizable(true);
