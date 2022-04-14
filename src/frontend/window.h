@@ -17,6 +17,7 @@ class Window : public QWidget
 
 private:
     enum{ windowSize = 800 };
+    enum{ kiloBytes_to_gigaBytes = 1'048'576 };
     QTabWidget *tab;
     Chart cpuChart;
     Chart memChart;
@@ -34,14 +35,14 @@ signals:
 
 public:
     Window();
-    void updateDetailPage(MySysInfo);
+    void updateDetailPage(MySysInfo*);
     ~Window();
 private:
     void prepareUpdates();
     void createRessourcePage();
     void createDetailPage();
-    void createTitleDetailPage();
-    void addProcessToDetailPage(MySysInfo);
+    void createTitleDetailPage(const std::string& time);
+    void addProcessToDetailPage(MySysInfo &pmySysInfo);
 };
 
 
