@@ -42,7 +42,7 @@ private:
     void createRessourcePage();
     void createDetailPage();
     void createTitleDetailPage(const std::string& time);
-    void addProcessToDetailPage(MySysInfo* pmySysInfo);
+    void addProcessToDetailPage(MySysInfo &pmySysInfo);
 };
 
 
