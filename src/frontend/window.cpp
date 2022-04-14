@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QThread>
 #include <QDeadlineTimer>
+#include <QScrollArea>
 #include <tuple>
 #include <chrono>
 #include "window.h"
@@ -17,14 +18,13 @@ Window::Window(): systemRessource{},
                   mySysInfo{}, 
                   cpuChart{this, "CPU Usage", std::tuple<int, int>(0, 100)}, 
                   memChart{this, "Memory Usage",
-                           std::tuple<int, int>(0, (SystemRessource::getRessourceFomSysInfo(MySysInfo{}).totalMemory / 1'048'576.0))},
+                           std::tuple<int, int>(0, (SystemRessource::getRessourceFomSysInfo(MySysInfo{}).totalMemory / kiloBytes_to_gigaBytes))},
                   ioChart{this, "I/O Usage", std::tuple<int, int>(0, 2000)},
                   updateManager{}, 
                   updateThread{this}
 {
     createRessourcePage();
     createDetailPage();
-    updateDetailPage(SystemRessource::listProcess(MySysInfo{}));
     prepareUpdates();
 }
 
@@ -43,58 +43,61 @@ void Window::createRessourcePage()
 
 void Window::createDetailPage()
 {
-    std::cout << "Window::createDetailPage " << std::endl;
     detailPage = new QWidget(this);
     detailLayout = new QGridLayout;
-    createTitleDetailPage();
+    QScrollArea *scroll = new QScrollArea(tab);
+    scroll->setWidget(detailPage);
+    mySysInfo = SystemRessource::listProcess(mySysInfo);
+    createTitleDetailPage(mySysInfo);
+    addProcessToDetailPage(mySysInfo);
     detailPage->setLayout(detailLayout);
-    tab->addTab(detailPage, "Detail");
+    scroll->setWidgetResizable(true);
+//    QScrollBar *scrollBar = new QScrollBar(Qt::Vertical, detailPage);
+//    tab->addTab(detailPage, "Detail");
+    tab->addTab(scroll, "Detail");
 }
 
-void Window::createTitleDetailPage()
+void Window::createTitleDetailPage(MySysInfo mySysInfo)
 {
-    std::cout << "Window::createTitleDetailPage " << std::endl;
     QLabel *title_pid = new QLabel(tr("PID"));
-    QLabel *title_ppid = new QLabel(tr("PPID"));
-    QLabel *title_user_usage = new QLabel(tr("User Usage"));
-    QLabel *title_sys_usage = new QLabel(tr("System Usage"));
+    QLabel *title_ppid = new QLabel(tr("Name"));
     QLabel *title_cpu_usage = new QLabel(tr("CPU Usage"));
     QLabel *title_mem_usage = new QLabel(tr("Memory Usage"));
+    QLabel *title_user_usage = new QLabel(tr("User Usage"));
+    QLabel *title_sys_usage = new QLabel(tr("System Usage"));
+    auto time = "time: " + mySysInfo.listProcess[0].time;
+    QLabel *title_time = new QLabel(time.c_str());
     
     detailLayout->addWidget(title_pid, 0, 0);
     detailLayout->addWidget(title_ppid, 0, 1);
-    detailLayout->addWidget(title_user_usage, 0, 2);
-    detailLayout->addWidget(title_sys_usage, 0, 3);
-    detailLayout->addWidget(title_cpu_usage, 0, 4);
-    detailLayout->addWidget(title_mem_usage, 0, 5);
+    detailLayout->addWidget(title_cpu_usage, 0, 2);
+    detailLayout->addWidget(title_mem_usage, 0, 3);
+    detailLayout->addWidget(title_user_usage, 0, 4);
+    detailLayout->addWidget(title_sys_usage, 0, 5);
+    detailLayout->addWidget(title_time, 0, 6);
 }
 
 void Window::addProcessToDetailPage(MySysInfo pmySysInfo)
 {
     int row_count = 1;
-    std::cout << "Window::addProcessToDetailPage " << pmySysInfo.listProcess.size() << std::endl;
-//    sort(pmySysInfo.listProcess.begin(), pmySysInfo.listProcess.end(), [](const ProcessSysInfo& lhs, const ProcessSysInfo& rhs) {
-//        return lhs.cpuUsage > rhs.cpuUsage;
-//    });
-    int i = 0;
+/*    sort(pmySysInfo.listProcess.begin(), pmySysInfo.listProcess.end(), [](const ProcessSysInfo& lhs, const ProcessSysInfo& rhs) {
+        return lhs.cpuUsage > rhs.cpuUsage;
+    });*/
     for(auto process : pmySysInfo.listProcess)
     {
-        i++;
-        if(i > 10 )
-            return;
         QLabel *pid = new QLabel(QString::number(process.pid));
-        QLabel *ppid = new QLabel(QString::number(process.ppid));
-        QLabel *user_usage = new QLabel(process.usrUsage);
-        QLabel *sys_usage = new QLabel(process.systemUsage);
+        QLabel *name = new QLabel(process.cmd.c_str());
         QLabel *cpu_usage = new QLabel(process.cpuUsage);
         QLabel *mem_usage = new QLabel(process.memUsage);
+        QLabel *user_usage = new QLabel(process.usrUsage);
+        QLabel *sys_usage = new QLabel(process.systemUsage);
 
         detailLayout->addWidget(pid, row_count, 0);
-        detailLayout->addWidget(ppid, row_count, 1);
-        detailLayout->addWidget(user_usage, row_count, 2);
-        detailLayout->addWidget(sys_usage, row_count, 3);
-        detailLayout->addWidget(cpu_usage, row_count, 4);
-        detailLayout->addWidget(mem_usage, row_count, 5);
+        detailLayout->addWidget(name, row_count, 1);
+        detailLayout->addWidget(cpu_usage, row_count, 2);
+        detailLayout->addWidget(mem_usage, row_count, 3);
+        detailLayout->addWidget(user_usage, row_count, 4);
+        detailLayout->addWidget(sys_usage, row_count, 5);
         ++row_count;
     }
 }
@@ -108,7 +111,7 @@ void Window::updateDetailPage(MySysInfo pmySysInfo)
     }
     delete detailLayout;
     detailLayout = new QGridLayout;
-    createTitleDetailPage();
+    createTitleDetailPage(pmySysInfo);
     addProcessToDetailPage(pmySysInfo);
     detailPage->setLayout(detailLayout);
 }
@@ -134,5 +137,3 @@ Window::~Window()
     updateThread.wait();
     updateThread.quit();
 }
-
-
