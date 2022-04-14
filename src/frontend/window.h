@@ -35,14 +35,14 @@ signals:
 
 public:
     Window();
-    void updateDetailPage(MySysInfo);
+    void updateDetailPage(MySysInfo*);
     ~Window();
 private:
     void prepareUpdates();
     void createRessourcePage();
     void createDetailPage();
-    void createTitleDetailPage(MySysInfo);
-    void addProcessToDetailPage(MySysInfo);
+    void createTitleDetailPage(const std::string& time);
+    void addProcessToDetailPage(MySysInfo* pmySysInfo);
 };
 
 
